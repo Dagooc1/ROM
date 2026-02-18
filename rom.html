@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>7-Segment ROM Data Generator for Simulator</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@400;600;800&display=swap');
+
+        * { box-sizing: border-box; }
+
+        :root {
+            --red: #ff2a2a;
+            --red-dim: #7a1010;
+            --bg: #0d0d0d;
+            --panel: #141414;
+            --panel2: #1c1c1c;
+            --border: #2a2a2a;
+            --text: #e0e0e0;
+            --accent: #ff2a2a;
+            --green: #00ff88;
+            --amber: #ffb300;
+        }
+
+        body {
+            background: var(--bg);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 10px;
+            font-family: 'Exo 2', sans-serif;
+            color: var(--text);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: clamp(1.6rem, 5vw, 2.8rem);
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            color: var(--red);
+            text-shadow: 0 0 30px rgba(255,42,42,0.4);
+            margin: 0 0 6px;
+        }
+
+        header p {
+            color: #666;
+            margin: 0;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem;
+            letter-spacing: 0.15em;
+        }
+
+        /* Segment Preview */
+        .seg-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 24px 0;
+            align-items: center;
+        }
+
+        .seg-wrap { text-align: center; }
+
+        .seg-label {
+            font-size: 10px;
+            letter-spacing: 0.1em;
+            color: #555;
+            margin-top: 6px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        canvas.seg {
+            display: block;
+            background: #0a0a0a;
+            border: 1px solid #222;
+            border-radius: 4px;
+        }
+
+        /* Controls */
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .ctrl-group {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .ctrl-group h3 {
+            margin: 0 0 12px;
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            color: #555;
+            text-transform: uppercase;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 4px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--panel2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 0.9rem;
+            font-family: 'Share Tech Mono', monospace;
+            margin-bottom: 12px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--red);
+        }
+
+        .btn-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            flex: 1 1 180px;
+            padding: 13px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            font-family: 'Exo 2', sans-serif;
+            cursor: pointer;
+            transition: all 0.15s;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-primary {
+            background: var(--red);
+            color: white;
+        }
+
+        .btn-primary:hover { background: #e00; box-shadow: 0 0 20px rgba(255,42,42,0.4); }
+
+        .btn-secondary {
+            background: var(--panel2);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover { border-color: var(--red); color: var(--red); }
+
+        /* Status */
+        .status {
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.82rem;
+            margin-bottom: 16px;
+            border-left: 3px solid var(--green);
+            background: rgba(0,255,136,0.05);
+            color: var(--green);
+        }
+
+        .status.error { border-color: var(--red); background: rgba(255,42,42,0.05); color: var(--red); }
+
+        /* Preview */
+        .preview-box {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .preview-box h3 {
+            margin: 0 0 10px;
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            color: #555;
+            text-transform: uppercase;
+        }
+
+        .preview-content {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            white-space: pre;
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: 180px;
+            color: #00ff88;
+            background: #0a0a0a;
+            border-radius: 6px;
+            padding: 12px;
+            line-height: 1.6;
+        }
+
+        /* Table */
+        .table-wrap {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .table-scroll {
+            max-height: 420px;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead th {
+            background: #1a0000;
+            color: var(--red);
+            padding: 10px 12px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            position: sticky;
+            top: 0;
+            border-bottom: 1px solid #2a0000;
+            white-space: nowrap;
+        }
+
+        td {
+            border-bottom: 1px solid #1a1a1a;
+            padding: 7px 12px;
+            text-align: center;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        tr:hover td { background: #1a1a1a; color: #fff; }
+
+        td strong {
+            color: var(--amber);
+            font-size: 13px;
+        }
+
+        td.disp { color: var(--green); font-weight: bold; font-size: 14px; }
+
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            color: #444;
+            font-size: 12px;
+            font-family: 'Share Tech Mono', monospace;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--red-dim); }
+
+        @media (max-width: 500px) {
+            button { flex: 1 1 100%; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>7-SEG ROM GENERATOR</h1>
+        <p>256×16 · DIGITAL CIRCUIT SIMULATOR · ADDRESSES 0x00–0xFF</p>
+    </header>
+
+    <!-- Live segment preview -->
+    <div class="seg-row">
+        <div class="seg-wrap">
+            <canvas class="seg" id="segL" width="70" height="110"></canvas>
+            <div class="seg-label">HIGH BYTE</div>
+        </div>
+        <div class="seg-wrap">
+            <canvas class="seg" id="segR" width="70" height="110"></canvas>
+            <div class="seg-label">LOW BYTE</div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <div class="ctrl-group">
+            <h3>Display Mode</h3>
+            <label>Output Format</label>
+            <select id="displayMode" onchange="onModeChange()">
+                <option value="hex" selected>Hexadecimal (00–FF) — recommended</option>
+                <option value="decimal">Decimal (00–99)</option>
+                <option value="custom">Custom Range</option>
+            </select>
+
+            <label>Segment Type</label>
+            <select id="segmentType">
+                <option value="commonCathode" selected>Common Cathode (active HIGH)</option>
+                <option value="commonAnode">Common Anode (active LOW)</option>
+            </select>
+        </div>
+        <div class="ctrl-group" id="customGroup" style="display:none">
+            <h3>Custom Range</h3>
+            <label>Start Address (Hex)</label>
+            <input type="text" id="startHex" value="00" maxlength="2">
+            <label>End Address (Hex)</label>
+            <input type="text" id="endHex" value="FF" maxlength="2">
+        </div>
+    </div>
+
+    <div class="btn-row">
+        <button class="btn-primary" onclick="generateROMData()">▶ GENERATE ROM DATA</button>
+        <button class="btn-secondary" onclick="copyToClipboard()">⎘ COPY TO CLIPBOARD</button>
+        <button class="btn-secondary" onclick="downloadText()">↓ DOWNLOAD .TXT</button>
+        <button class="btn-secondary" onclick="downloadCSV()">↓ DOWNLOAD .CSV</button>
+    </div>
+
+    <div id="status" class="status">Ready — click GENERATE to build ROM table for 0x00–0xFF</div>
+
+    <div class="preview-box">
+        <h3>Preview — First 32 Entries</h3>
+        <div class="preview-content" id="preview">// Click GENERATE ROM DATA to begin</div>
+    </div>
+
+    <div class="table-wrap">
+        <div class="table-scroll">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>ADDR (HEX)</th>
+                        <th>ADDR (DEC)</th>
+                        <th>DISPLAY</th>
+                        <th>HI BYTE (HEX)</th>
+                        <th>LO BYTE (HEX)</th>
+                        <th>ROM WORD (16-bit)</th>
+                        <th>HI BIN</th>
+                        <th>LO BIN</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="8" style="color:#444;padding:20px">Generate data to populate table</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>7-SEG ROM GENERATOR · COMMON CATHODE: F = 0x71 · COMMON ANODE: F = 0x8E</footer>
+</div>
+
+<script>
+    // ─── 7-segment codes (Common Cathode, active HIGH) ───────────────────────
+    //  Segments: bit7=DP  bit6=g  bit5=f  bit4=e  bit3=d  bit2=c  bit1=b  bit0=a
+    //
+    //       aaa
+    //      f   b
+    //      f   b
+    //       ggg
+    //      e   c
+    //      e   c
+    //       ddd
+    //
+    //  Digit  a  b  c  d  e  f  g   hex
+    //  0      1  1  1  1  1  1  0   3F  ✓
+    //  1      0  1  1  0  0  0  0   06  ✓
+    //  2      1  1  0  1  1  0  1   5B  ✓
+    //  3      1  1  1  1  0  0  1   4F  ✓
+    //  4      0  1  1  0  0  1  1   66  ✓
+    //  5      1  0  1  1  0  1  1   6D  ✓
+    //  6      1  0  1  1  1  1  1   7D  ✓
+    //  7      1  1  1  0  0  0  0   07  ✓
+    //  8      1  1  1  1  1  1  1   7F  ✓
+    //  9      1  1  1  1  0  1  1   6F  ✓
+    //  A      1  1  1  0  1  1  1   77  ✓
+    //  B      0  0  1  1  1  1  1   7C  ✓
+    //  C      1  0  0  1  1  1  0   39  ✓
+    //  D      0  1  1  1  1  0  1   5E  ✓
+    //  E      1  0  0  1  1  1  1   79  ✓
+    //  F      1  0  0  0  1  1  1   71  ← FIXED (was 0x0E which is wrong)
+
+    const CC = {
+        '0': 0x3F, '1': 0x06, '2': 0x5B, '3': 0x4F,
+        '4': 0x66, '5': 0x6D, '6': 0x7D, '7': 0x07,
+        '8': 0x7F, '9': 0x6F, 'A': 0x77, 'B': 0x7C,
+        'C': 0x39, 'D': 0x5E, 'E': 0x79, 'F': 0x71,
+        ' ': 0x00
+    };
+
+    // Common Anode = bitwise NOT of CC (within 8 bits)
+    const CA = {};
+    for (const k in CC) CA[k] = (~CC[k]) & 0xFF;
+
+    let romData = [];
+    let encoding = CC;
+
+    // ─── Segment canvas renderer ──────────────────────────────────────────────
+    function drawSeg(canvas, code) {
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
+        ctx.clearRect(0, 0, W, H);
+
+        const ON  = '#ff2a2a';
+        const OFF = '#1a0000';
+        const T = 8, G = 3;
+        const x0 = 10, y0 = 8;
+        const sw = W - 20, sh = (H - 16 - G*2) / 2;
+
+        function seg(on, draw) {
+            ctx.fillStyle = on ? ON : OFF;
+            ctx.shadowColor = on ? ON : 'transparent';
+            ctx.shadowBlur = on ? 8 : 0;
+            draw();
+        }
+
+        const bits = code;
+
+        // a — top
+        seg(bits & 0x01, () => hBar(x0, y0, sw, T));
+        // b — top right
+        seg(bits & 0x02, () => vBar(x0 + sw, y0, sh, T));
+        // c — bottom right
+        seg(bits & 0x04, () => vBar(x0 + sw, y0 + sh + G*2, sh, T));
+        // d — bottom
+        seg(bits & 0x08, () => hBar(x0, y0 + sh*2 + G*4, sw, T));
+        // e — bottom left
+        seg(bits & 0x10, () => vBar(x0 - T, y0 + sh + G*2, sh, T));
+        // f — top left
+        seg(bits & 0x20, () => vBar(x0 - T, y0, sh, T));
+        // g — middle
+        seg(bits & 0x40, () => hBar(x0, y0 + sh + G, sw, T));
+
+        function hBar(x, y, w, t) {
+            ctx.beginPath();
+            ctx.moveTo(x + t/2, y); ctx.lineTo(x + w - t/2, y);
+            ctx.lineTo(x + w, y + t/2); ctx.lineTo(x + w - t/2, y + t);
+            ctx.lineTo(x + t/2, y + t); ctx.lineTo(x, y + t/2);
+            ctx.closePath(); ctx.fill();
+        }
+
+        function vBar(x, y, h, t) {
+            ctx.beginPath();
+            ctx.moveTo(x, y + t/2); ctx.lineTo(x + t/2, y);
+            ctx.lineTo(x + t, y + t/2); ctx.lineTo(x + t, y + h - t/2);
+            ctx.lineTo(x + t/2, y + h); ctx.lineTo(x, y + h - t/2);
+            ctx.closePath(); ctx.fill();
+        }
+    }
+
+    // ─── Helpers ──────────────────────────────────────────────────────────────
+    const hex2 = n => n.toString(16).toUpperCase().padStart(2, '0');
+    const bin8 = n => n.toString(2).padStart(8, '0');
+
+    function getCode(ch) {
+        return encoding[ch.toUpperCase()] ?? encoding[' '];
+    }
+
+    function onModeChange() {
+        document.getElementById('customGroup').style.display =
+            document.getElementById('displayMode').value === 'custom' ? 'block' : 'none';
+    }
+
+    // ─── Main generation ──────────────────────────────────────────────────────
+    function generateROMData() {
+        const mode = document.getElementById('displayMode').value;
+        const type = document.getElementById('segmentType').value;
+        encoding = type === 'commonCathode' ? CC : CA;
+
+        let startAddr = 0, endAddr = 255;
+
+        if (mode === 'decimal') {
+            endAddr = 99;
+        } else if (mode === 'custom') {
+            startAddr = parseInt(document.getElementById('startHex').value, 16) || 0;
+            endAddr   = parseInt(document.getElementById('endHex').value, 16) || 255;
+            if (startAddr > endAddr) [startAddr, endAddr] = [endAddr, startAddr];
+            startAddr = Math.max(0, startAddr);
+            endAddr   = Math.min(255, endAddr);
+        }
+
+        romData = [];
+        let previewStr = '';
+        let rows = '';
+
+        for (let addr = startAddr; addr <= endAddr; addr++) {
+            let display, leftCh, rightCh;
+
+            if (mode === 'decimal') {
+                display = addr.toString().padStart(2, '0');
+                leftCh  = display[0];
+                rightCh = display[1];
+            } else {
+                display = hex2(addr);
+                leftCh  = display[0];
+                rightCh = display[1];
+            }
+
+            const hiCode = getCode(leftCh);
+            const loCode = getCode(rightCh);
+            const word   = hex2(hiCode) + hex2(loCode);
+
+            romData.push({ addr, display, leftCh, rightCh, hiCode, loCode, word });
+
+            if (addr - startAddr < 32) {
+                previewStr += `@${hex2(addr)}  ${word}    // ${display}  →  HI:${hex2(hiCode)} LO:${hex2(loCode)}\n`;
+            }
+
+            rows += `<tr>
+                <td>0x${hex2(addr)}</td>
+                <td>${addr}</td>
+                <td class="disp">${display}</td>
+                <td>${hex2(hiCode)}</td>
+                <td>${hex2(loCode)}</td>
+                <td><strong>${word}</strong></td>
+                <td style="color:#555;font-size:11px">${bin8(hiCode)}</td>
+                <td style="color:#555;font-size:11px">${bin8(loCode)}</td>
+            </tr>`;
+        }
+
+        document.getElementById('preview').textContent = previewStr;
+        document.getElementById('tableBody').innerHTML = rows;
+
+        // Update live segment display with address 0
+        if (romData.length > 0) refreshPreviewDisplays(romData[0]);
+
+        const status = document.getElementById('status');
+        status.className = 'status';
+        status.textContent = `✓ Generated ${romData.length} entries  |  Range: 0x${hex2(startAddr)}–0x${hex2(endAddr)}  |  Type: ${type === 'commonCathode' ? 'Common Cathode' : 'Common Anode'}  |  F = 0x${hex2(encoding['F'])}`;
+
+        // Walk through first few addresses on seg display
+        animateSegPreview(startAddr, Math.min(endAddr, startAddr + 15));
+    }
+
+    let previewTimer = null;
+    function animateSegPreview(from, to) {
+        clearInterval(previewTimer);
+        let i = from;
+        previewTimer = setInterval(() => {
+            if (i > to) { clearInterval(previewTimer); return; }
+            const entry = romData.find(e => e.addr === i);
+            if (entry) refreshPreviewDisplays(entry);
+            i++;
+        }, 200);
+    }
+
+    function refreshPreviewDisplays(entry) {
+        drawSeg(document.getElementById('segL'), entry.hiCode);
+        drawSeg(document.getElementById('segR'), entry.loCode);
+    }
+
+    // ─── Export functions ─────────────────────────────────────────────────────
+    function copyToClipboard() {
+        if (!romData.length) { alert('Generate data first!'); return; }
+        let text = '// 7-Segment ROM Data — 256×16\n// @address  HILOBYTE (hex)\n\n';
+        romData.forEach(e => { text += `@${hex2(e.addr)} ${e.word}\n`; });
+        navigator.clipboard.writeText(text).then(() => {
+            document.getElementById('status').textContent = '✓ Copied to clipboard — paste into your simulator ROM editor';
+        }).catch(err => alert('Copy failed: ' + err));
+    }
+
+    function downloadText() {
+        if (!romData.length) { alert('Generate data first!'); return; }
+        let text = '// 7-Segment ROM Data — 256×16\n// @address  HILOBYTE (hex)\n\n';
+        romData.forEach(e => { text += `@${hex2(e.addr)} ${e.word}\n`; });
+        triggerDownload(text, 'rom_data.txt', 'text/plain');
+        document.getElementById('status').textContent = '✓ rom_data.txt downloaded';
+    }
+
+    function downloadCSV() {
+        if (!romData.length) { alert('Generate data first!'); return; }
+        let csv = 'Address(Hex),Address(Dec),Display,HI Digit,LO Digit,HI Code(Hex),LO Code(Hex),ROM Word(16-bit),HI Binary,LO Binary\n';
+        romData.forEach(e => {
+            csv += `0x${hex2(e.addr)},${e.addr},${e.display},${e.leftCh},${e.rightCh},${hex2(e.hiCode)},${hex2(e.loCode)},${e.word},${bin8(e.hiCode)},${bin8(e.loCode)}\n`;
+        });
+        triggerDownload(csv, 'rom_data.csv', 'text/csv');
+        document.getElementById('status').textContent = '✓ rom_data.csv downloaded';
+    }
+
+    function triggerDownload(content, filename, mime) {
+        const blob = new Blob([content], { type: mime });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = filename; a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // ─── Init ─────────────────────────────────────────────────────────────────
+    window.onload = () => {
+        // Draw blank displays
+        drawSeg(document.getElementById('segL'), 0x3F);
+        drawSeg(document.getElementById('segR'), 0x3F);
+        generateROMData();
+    };
+</script>
+</body>
+</html>

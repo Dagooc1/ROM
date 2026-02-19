@@ -17,7 +17,6 @@
             --panel2: #1c1c1c;
             --border: #2a2a2a;
             --text: #e0e0e0;
-            --accent: #ff2a2a;
             --green: #00ff88;
             --amber: #ffb300;
         }
@@ -34,10 +33,7 @@
             color: var(--text);
         }
 
-        .container {
-            width: 100%;
-            max-width: 1100px;
-        }
+        .container { width: 100%; max-width: 1100px; }
 
         header {
             text-align: center;
@@ -67,9 +63,10 @@
         .seg-row {
             display: flex;
             justify-content: center;
-            gap: 12px;
+            gap: 16px;
             margin: 24px 0;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .seg-wrap { text-align: center; }
@@ -84,10 +81,31 @@
 
         canvas.seg {
             display: block;
-            background: #0a0a0a;
-            border: 1px solid #222;
-            border-radius: 4px;
+            background: #080808;
+            border: 1px solid #1e1e1e;
+            border-radius: 6px;
         }
+
+        /* Segment reference table */
+        .seg-ref {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            color: #666;
+            overflow-x: auto;
+        }
+
+        .seg-ref h4 { margin: 0 0 8px; color: #444; letter-spacing: 0.1em; font-size: 10px; text-transform: uppercase; }
+
+        .seg-ref table { border-collapse: collapse; }
+        .seg-ref td, .seg-ref th { padding: 3px 8px; border: 1px solid #222; text-align: center; white-space: nowrap; }
+        .seg-ref th { color: var(--red); background: #1a0000; }
+        .seg-ref .ok { color: var(--green); }
+        .seg-ref .hi { color: var(--amber); }
 
         /* Controls */
         .controls {
@@ -134,10 +152,7 @@
             appearance: none;
         }
 
-        select:focus, input:focus {
-            outline: none;
-            border-color: var(--red);
-        }
+        select:focus, input:focus { outline: none; border-color: var(--red); }
 
         .btn-row {
             display: flex;
@@ -159,22 +174,11 @@
             letter-spacing: 0.05em;
         }
 
-        .btn-primary {
-            background: var(--red);
-            color: white;
-        }
-
+        .btn-primary { background: var(--red); color: white; }
         .btn-primary:hover { background: #e00; box-shadow: 0 0 20px rgba(255,42,42,0.4); }
-
-        .btn-secondary {
-            background: var(--panel2);
-            color: var(--text);
-            border: 1px solid var(--border);
-        }
-
+        .btn-secondary { background: var(--panel2); color: var(--text); border: 1px solid var(--border); }
         .btn-secondary:hover { border-color: var(--red); color: var(--red); }
 
-        /* Status */
         .status {
             padding: 10px 16px;
             border-radius: 6px;
@@ -186,9 +190,6 @@
             color: var(--green);
         }
 
-        .status.error { border-color: var(--red); background: rgba(255,42,42,0.05); color: var(--red); }
-
-        /* Preview */
         .preview-box {
             background: var(--panel);
             border: 1px solid var(--border);
@@ -219,7 +220,6 @@
             line-height: 1.6;
         }
 
-        /* Table */
         .table-wrap {
             background: var(--panel);
             border: 1px solid var(--border);
@@ -228,17 +228,9 @@
             margin-bottom: 20px;
         }
 
-        .table-scroll {
-            max-height: 420px;
-            overflow-y: auto;
-            overflow-x: auto;
-        }
+        .table-scroll { max-height: 420px; overflow-y: auto; overflow-x: auto; }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
 
         thead th {
             background: #1a0000;
@@ -263,32 +255,25 @@
         }
 
         tr:hover td { background: #1a1a1a; color: #fff; }
-
-        td strong {
-            color: var(--amber);
-            font-size: 13px;
-        }
-
+        td strong { color: var(--amber); font-size: 13px; }
         td.disp { color: var(--green); font-weight: bold; font-size: 14px; }
 
         footer {
             text-align: center;
             padding: 20px 0;
             color: #444;
-            font-size: 12px;
+            font-size: 11px;
             font-family: 'Share Tech Mono', monospace;
             border-top: 1px solid var(--border);
+            line-height: 2;
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg); }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--red-dim); }
 
-        @media (max-width: 500px) {
-            button { flex: 1 1 100%; }
-        }
+        @media (max-width: 500px) { button { flex: 1 1 100%; } }
     </style>
 </head>
 <body>
@@ -301,13 +286,42 @@
     <!-- Live segment preview -->
     <div class="seg-row">
         <div class="seg-wrap">
-            <canvas class="seg" id="segL" width="70" height="110"></canvas>
-            <div class="seg-label">HIGH BYTE</div>
+            <canvas class="seg" id="segL" width="80" height="120"></canvas>
+            <div class="seg-label">HIGH BYTE (LEFT DIGIT)</div>
         </div>
+        <div class="seg-wrap" style="font-size:40px;color:#333;padding-bottom:20px">:</div>
         <div class="seg-wrap">
-            <canvas class="seg" id="segR" width="70" height="110"></canvas>
-            <div class="seg-label">LOW BYTE</div>
+            <canvas class="seg" id="segR" width="80" height="120"></canvas>
+            <div class="seg-label">LOW BYTE (RIGHT DIGIT)</div>
         </div>
+    </div>
+
+    <!-- Segment reference -->
+    <div class="seg-ref">
+        <h4>Segment Bit Mapping (Common Cathode) — bit0=a, bit1=b, bit2=c, bit3=d, bit4=e, bit5=f, bit6=g</h4>
+        <table>
+            <tr>
+                <th>Digit</th>
+                <th>a(b0)</th><th>b(b1)</th><th>c(b2)</th><th>d(b3)</th><th>e(b4)</th><th>f(b5)</th><th>g(b6)</th>
+                <th>HEX</th><th>Binary</th>
+            </tr>
+            <tr><td class="hi">0</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td>0</td><td class="hi">3F</td><td>0011 1111</td></tr>
+            <tr><td class="hi">1</td><td>0</td><td class="ok">1</td><td class="ok">1</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="hi">06</td><td>0000 0110</td></tr>
+            <tr><td class="hi">2</td><td class="ok">1</td><td class="ok">1</td><td>0</td><td class="ok">1</td><td class="ok">1</td><td>0</td><td class="ok">1</td><td class="hi">5B</td><td>0101 1011</td></tr>
+            <tr><td class="hi">3</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td>0</td><td>0</td><td class="ok">1</td><td class="hi">4F</td><td>0100 1111</td></tr>
+            <tr><td class="hi">4</td><td>0</td><td class="ok">1</td><td class="ok">1</td><td>0</td><td>0</td><td class="ok">1</td><td class="ok">1</td><td class="hi">66</td><td>0110 0110</td></tr>
+            <tr><td class="hi">5</td><td class="ok">1</td><td>0</td><td class="ok">1</td><td class="ok">1</td><td>0</td><td class="ok">1</td><td class="ok">1</td><td class="hi">6D</td><td>0110 1101</td></tr>
+            <tr><td class="hi">6</td><td class="ok">1</td><td>0</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="hi">7D</td><td>0111 1101</td></tr>
+            <tr><td class="hi">7</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="hi">07</td><td>0000 0111</td></tr>
+            <tr><td class="hi">8</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="hi">7F</td><td>0111 1111</td></tr>
+            <tr><td class="hi">9</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td>0</td><td class="ok">1</td><td class="ok">1</td><td class="hi">6F</td><td>0110 1111</td></tr>
+            <tr><td class="hi">A</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td>0</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="hi">77</td><td>0111 0111</td></tr>
+            <tr><td class="hi">B</td><td>0</td><td>0</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="hi">7C</td><td>0111 1100</td></tr>
+            <tr><td class="hi">C</td><td class="ok">1</td><td>0</td><td>0</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td>0</td><td class="hi">39</td><td>0011 1001</td></tr>
+            <tr><td class="hi" style="color:var(--red);font-weight:bold">D</td><td>0</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td>0</td><td class="ok">1</td><td class="hi" style="color:var(--red)">5E</td><td>0101 1110</td></tr>
+            <tr><td class="hi">E</td><td class="ok">1</td><td>0</td><td>0</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="hi">79</td><td>0111 1001</td></tr>
+            <tr><td class="hi">F</td><td class="ok">1</td><td>0</td><td>0</td><td>0</td><td class="ok">1</td><td class="ok">1</td><td class="ok">1</td><td class="hi">71</td><td>0111 0001</td></tr>
+        </table>
     </div>
 
     <!-- Controls -->
@@ -320,7 +334,6 @@
                 <option value="decimal">Decimal (00–99)</option>
                 <option value="custom">Custom Range</option>
             </select>
-
             <label>Segment Type</label>
             <select id="segmentType">
                 <option value="commonCathode" selected>Common Cathode (active HIGH)</option>
@@ -352,17 +365,17 @@
 
     <div class="table-wrap">
         <div class="table-scroll">
-            <table id="dataTable">
+            <table>
                 <thead>
                     <tr>
-                        <th>ADDR (HEX)</th>
-                        <th>ADDR (DEC)</th>
+                        <th>ADDR HEX</th>
+                        <th>ADDR DEC</th>
                         <th>DISPLAY</th>
-                        <th>HI BYTE (HEX)</th>
-                        <th>LO BYTE (HEX)</th>
+                        <th>HI BYTE</th>
+                        <th>LO BYTE</th>
                         <th>ROM WORD (16-bit)</th>
-                        <th>HI BIN</th>
-                        <th>LO BIN</th>
+                        <th>HI BINARY</th>
+                        <th>LO BINARY</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -372,113 +385,165 @@
         </div>
     </div>
 
-    <footer>7-SEG ROM GENERATOR · COMMON CATHODE: F = 0x71 · COMMON ANODE: F = 0x8E</footer>
+    <footer>
+        7-SEG ROM GENERATOR · 256×16 ROM · COMMON CATHODE ENCODING<br>
+        D = 0x5E (0101 1110) · F = 0x71 (0111 0001) · bit0=a · bit1=b · bit2=c · bit3=d · bit4=e · bit5=f · bit6=g
+    </footer>
 </div>
 
 <script>
-    // ─── 7-segment codes (Common Cathode, active HIGH) ───────────────────────
-    //  Segments: bit7=DP  bit6=g  bit5=f  bit4=e  bit3=d  bit2=c  bit1=b  bit0=a
+    // ═══════════════════════════════════════════════════════════════════════
+    //  7-SEGMENT ENCODING — Common Cathode (active HIGH)
     //
-    //       aaa
-    //      f   b
-    //      f   b
-    //       ggg
-    //      e   c
-    //      e   c
-    //       ddd
+    //  Standard bit assignment:
+    //    bit 0 = a (top horizontal)
+    //    bit 1 = b (top-right vertical)
+    //    bit 2 = c (bottom-right vertical)
+    //    bit 3 = d (bottom horizontal)
+    //    bit 4 = e (bottom-left vertical)
+    //    bit 5 = f (top-left vertical)
+    //    bit 6 = g (middle horizontal)
+    //    bit 7 = DP (decimal point, unused)
     //
-    //  Digit  a  b  c  d  e  f  g   hex
-    //  0      1  1  1  1  1  1  0   3F  ✓
-    //  1      0  1  1  0  0  0  0   06  ✓
-    //  2      1  1  0  1  1  0  1   5B  ✓
-    //  3      1  1  1  1  0  0  1   4F  ✓
-    //  4      0  1  1  0  0  1  1   66  ✓
-    //  5      1  0  1  1  0  1  1   6D  ✓
-    //  6      1  0  1  1  1  1  1   7D  ✓
-    //  7      1  1  1  0  0  0  0   07  ✓
-    //  8      1  1  1  1  1  1  1   7F  ✓
-    //  9      1  1  1  1  0  1  1   6F  ✓
-    //  A      1  1  1  0  1  1  1   77  ✓
-    //  B      0  0  1  1  1  1  1   7C  ✓
-    //  C      1  0  0  1  1  1  0   39  ✓
-    //  D      0  1  1  1  1  0  1   5E  ✓
-    //  E      1  0  0  1  1  1  1   79  ✓
-    //  F      1  0  0  0  1  1  1   71  ← FIXED (was 0x0E which is wrong)
+    //         aaa
+    //        f   b
+    //        f   b
+    //         ggg
+    //        e   c
+    //        e   c
+    //         ddd
+    //
+    //  D = 0x5E = 0101 1110
+    //    bit1=b ✓  bit2=c ✓  bit3=d ✓  bit4=e ✓  bit6=g ✓
+    //    → lowercase d shape (b,c,d,e,g) ✓
+    // ═══════════════════════════════════════════════════════════════════════
 
     const CC = {
-        '0': 0x3F, '1': 0x06, '2': 0x5B, '3': 0x4F,
-        '4': 0x66, '5': 0x6D, '6': 0x7D, '7': 0x07,
-        '8': 0x7F, '9': 0x6F, 'A': 0x77, 'B': 0x7C,
-        'C': 0x39, 'D': 0x5E, 'E': 0x79, 'F': 0x71,
+        '0': 0x3F,  // 0011 1111  a,b,c,d,e,f
+        '1': 0x06,  // 0000 0110  b,c
+        '2': 0x5B,  // 0101 1011  a,b,d,e,g
+        '3': 0x4F,  // 0100 1111  a,b,c,d,g
+        '4': 0x66,  // 0110 0110  b,c,f,g
+        '5': 0x6D,  // 0110 1101  a,c,d,f,g
+        '6': 0x7D,  // 0111 1101  a,c,d,e,f,g
+        '7': 0x07,  // 0000 0111  a,b,c
+        '8': 0x7F,  // 0111 1111  a,b,c,d,e,f,g
+        '9': 0x6F,  // 0110 1111  a,b,c,d,f,g
+        'A': 0x77,  // 0111 0111  a,b,c,e,f,g
+        'B': 0x7C,  // 0111 1100  c,d,e,f,g
+        'C': 0x39,  // 0011 1001  a,d,e,f
+        'D': 0x5E,  // 0101 1110  b,c,d,e,g  (lowercase d shape)
+        'E': 0x79,  // 0111 1001  a,d,e,f,g
+        'F': 0x71,  // 0111 0001  a,e,f,g
         ' ': 0x00
     };
 
-    // Common Anode = bitwise NOT of CC (within 8 bits)
+    // Common Anode = bitwise NOT (8-bit)
     const CA = {};
     for (const k in CC) CA[k] = (~CC[k]) & 0xFF;
 
-    let romData = [];
+    let romData  = [];
     let encoding = CC;
 
-    // ─── Segment canvas renderer ──────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════════════
+    //  CANVAS SEGMENT RENDERER
+    //  Draws a 7-segment digit on a canvas element.
+    //  Bit mapping matches the CC table above exactly.
+    // ═══════════════════════════════════════════════════════════════════════
     function drawSeg(canvas, code) {
         const ctx = canvas.getContext('2d');
         const W = canvas.width, H = canvas.height;
         ctx.clearRect(0, 0, W, H);
 
         const ON  = '#ff2a2a';
-        const OFF = '#1a0000';
-        const T = 8, G = 3;
-        const x0 = 10, y0 = 8;
-        const sw = W - 20, sh = (H - 16 - G*2) / 2;
+        const OFF = '#1c0000';
+        const T = 9;   // segment thickness
+        const G = 2;   // gap between segments
+        const M = 10;  // margin
 
-        function seg(on, draw) {
-            ctx.fillStyle = on ? ON : OFF;
+        // Layout
+        const x1 = M;            // left x
+        const x2 = W - M - T;    // right x (for vertical bars)
+        const xH = M;            // horizontal bar start x
+        const wH = W - 2*M;      // horizontal bar width
+
+        const y1 = M;                          // top row y
+        const y2 = M + T + G + (H-2*M-3*T-2*G)/2 + G; // middle row y
+        const y3 = H - M - T;                 // bottom row y
+
+        const hV = (H - 2*M - 3*T - 2*G) / 2; // height of each vertical segment
+
+        function glow(on) {
             ctx.shadowColor = on ? ON : 'transparent';
-            ctx.shadowBlur = on ? 8 : 0;
-            draw();
+            ctx.shadowBlur  = on ? 10 : 0;
+            ctx.fillStyle   = on ? ON : OFF;
         }
 
-        const bits = code;
-
-        // a — top
-        seg(bits & 0x01, () => hBar(x0, y0, sw, T));
-        // b — top right
-        seg(bits & 0x02, () => vBar(x0 + sw, y0, sh, T));
-        // c — bottom right
-        seg(bits & 0x04, () => vBar(x0 + sw, y0 + sh + G*2, sh, T));
-        // d — bottom
-        seg(bits & 0x08, () => hBar(x0, y0 + sh*2 + G*4, sw, T));
-        // e — bottom left
-        seg(bits & 0x10, () => vBar(x0 - T, y0 + sh + G*2, sh, T));
-        // f — top left
-        seg(bits & 0x20, () => vBar(x0 - T, y0, sh, T));
-        // g — middle
-        seg(bits & 0x40, () => hBar(x0, y0 + sh + G, sw, T));
-
+        // Draw hexagonal horizontal bar
         function hBar(x, y, w, t) {
+            const d = t * 0.38;
             ctx.beginPath();
-            ctx.moveTo(x + t/2, y); ctx.lineTo(x + w - t/2, y);
-            ctx.lineTo(x + w, y + t/2); ctx.lineTo(x + w - t/2, y + t);
-            ctx.lineTo(x + t/2, y + t); ctx.lineTo(x, y + t/2);
-            ctx.closePath(); ctx.fill();
+            ctx.moveTo(x + d,   y);
+            ctx.lineTo(x + w - d, y);
+            ctx.lineTo(x + w,   y + t/2);
+            ctx.lineTo(x + w - d, y + t);
+            ctx.lineTo(x + d,   y + t);
+            ctx.lineTo(x,       y + t/2);
+            ctx.closePath();
+            ctx.fill();
         }
 
-        function vBar(x, y, h, t) {
+        // Draw hexagonal vertical bar
+        function vBar(x, y, w, h) {
+            const d = w * 0.38;
             ctx.beginPath();
-            ctx.moveTo(x, y + t/2); ctx.lineTo(x + t/2, y);
-            ctx.lineTo(x + t, y + t/2); ctx.lineTo(x + t, y + h - t/2);
-            ctx.lineTo(x + t/2, y + h); ctx.lineTo(x, y + h - t/2);
-            ctx.closePath(); ctx.fill();
+            ctx.moveTo(x + w/2, y);
+            ctx.lineTo(x + w,   y + d);
+            ctx.lineTo(x + w,   y + h - d);
+            ctx.lineTo(x + w/2, y + h);
+            ctx.lineTo(x,       y + h - d);
+            ctx.lineTo(x,       y + d);
+            ctx.closePath();
+            ctx.fill();
         }
+
+        // ── Segment a: top horizontal (bit 0) ─────────────────────────────
+        glow(code & 0x01);
+        hBar(xH, y1, wH, T);
+
+        // ── Segment b: top-right vertical (bit 1) ─────────────────────────
+        glow(code & 0x02);
+        vBar(x2, y1 + T + G, T, hV);
+
+        // ── Segment c: bottom-right vertical (bit 2) ──────────────────────
+        glow(code & 0x04);
+        vBar(x2, y2 + T + G, T, hV);
+
+        // ── Segment d: bottom horizontal (bit 3) ──────────────────────────
+        glow(code & 0x08);
+        hBar(xH, y3, wH, T);
+
+        // ── Segment e: bottom-left vertical (bit 4) ───────────────────────
+        glow(code & 0x10);
+        vBar(x1, y2 + T + G, T, hV);
+
+        // ── Segment f: top-left vertical (bit 5) ──────────────────────────
+        glow(code & 0x20);
+        vBar(x1, y1 + T + G, T, hV);
+
+        // ── Segment g: middle horizontal (bit 6) ──────────────────────────
+        glow(code & 0x40);
+        hBar(xH, y2, wH, T);
     }
 
-    // ─── Helpers ──────────────────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════════════
+    //  HELPERS
+    // ═══════════════════════════════════════════════════════════════════════
     const hex2 = n => n.toString(16).toUpperCase().padStart(2, '0');
     const bin8 = n => n.toString(2).padStart(8, '0');
 
     function getCode(ch) {
-        return encoding[ch.toUpperCase()] ?? encoding[' '];
+        return encoding[ch.toUpperCase()] ?? 0x00;
     }
 
     function onModeChange() {
@@ -486,7 +551,9 @@
             document.getElementById('displayMode').value === 'custom' ? 'block' : 'none';
     }
 
-    // ─── Main generation ──────────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════════════
+    //  GENERATE ROM DATA
+    // ═══════════════════════════════════════════════════════════════════════
     function generateROMData() {
         const mode = document.getElementById('displayMode').value;
         const type = document.getElementById('segmentType').value;
@@ -498,7 +565,7 @@
             endAddr = 99;
         } else if (mode === 'custom') {
             startAddr = parseInt(document.getElementById('startHex').value, 16) || 0;
-            endAddr   = parseInt(document.getElementById('endHex').value, 16) || 255;
+            endAddr   = parseInt(document.getElementById('endHex').value,   16) || 255;
             if (startAddr > endAddr) [startAddr, endAddr] = [endAddr, startAddr];
             startAddr = Math.max(0, startAddr);
             endAddr   = Math.min(255, endAddr);
@@ -543,17 +610,14 @@
             </tr>`;
         }
 
-        document.getElementById('preview').textContent = previewStr;
-        document.getElementById('tableBody').innerHTML = rows;
+        document.getElementById('preview').textContent  = previewStr;
+        document.getElementById('tableBody').innerHTML  = rows;
 
-        // Update live segment display with address 0
-        if (romData.length > 0) refreshPreviewDisplays(romData[0]);
+        if (romData.length > 0) refreshPreviews(romData[0]);
 
         const status = document.getElementById('status');
-        status.className = 'status';
-        status.textContent = `✓ Generated ${romData.length} entries  |  Range: 0x${hex2(startAddr)}–0x${hex2(endAddr)}  |  Type: ${type === 'commonCathode' ? 'Common Cathode' : 'Common Anode'}  |  F = 0x${hex2(encoding['F'])}`;
+        status.textContent = `✓ Generated ${romData.length} entries  |  0x${hex2(startAddr)}–0x${hex2(endAddr)}  |  ${type === 'commonCathode' ? 'Common Cathode' : 'Common Anode'}  |  D=0x${hex2(encoding['D'])}  F=0x${hex2(encoding['F'])}`;
 
-        // Walk through first few addresses on seg display
         animateSegPreview(startAddr, Math.min(endAddr, startAddr + 15));
     }
 
@@ -564,55 +628,56 @@
         previewTimer = setInterval(() => {
             if (i > to) { clearInterval(previewTimer); return; }
             const entry = romData.find(e => e.addr === i);
-            if (entry) refreshPreviewDisplays(entry);
+            if (entry) refreshPreviews(entry);
             i++;
-        }, 200);
+        }, 250);
     }
 
-    function refreshPreviewDisplays(entry) {
+    function refreshPreviews(entry) {
         drawSeg(document.getElementById('segL'), entry.hiCode);
         drawSeg(document.getElementById('segR'), entry.loCode);
     }
 
-    // ─── Export functions ─────────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════════════
+    //  EXPORT
+    // ═══════════════════════════════════════════════════════════════════════
     function copyToClipboard() {
         if (!romData.length) { alert('Generate data first!'); return; }
-        let text = '// 7-Segment ROM Data — 256×16\n// @address  HILOBYTE (hex)\n\n';
+        let text = '// 7-Segment ROM Data — 256×16\n// @address  WORD (HI_BYTE LO_BYTE)\n\n';
         romData.forEach(e => { text += `@${hex2(e.addr)} ${e.word}\n`; });
         navigator.clipboard.writeText(text).then(() => {
-            document.getElementById('status').textContent = '✓ Copied to clipboard — paste into your simulator ROM editor';
+            document.getElementById('status').textContent = '✓ Copied to clipboard — paste directly into simulator ROM editor';
         }).catch(err => alert('Copy failed: ' + err));
     }
 
     function downloadText() {
         if (!romData.length) { alert('Generate data first!'); return; }
-        let text = '// 7-Segment ROM Data — 256×16\n// @address  HILOBYTE (hex)\n\n';
+        let text = '// 7-Segment ROM Data — 256×16\n// @address  WORD (HI_BYTE LO_BYTE)\n\n';
         romData.forEach(e => { text += `@${hex2(e.addr)} ${e.word}\n`; });
-        triggerDownload(text, 'rom_data.txt', 'text/plain');
+        trigger(text, 'rom_data.txt', 'text/plain');
         document.getElementById('status').textContent = '✓ rom_data.txt downloaded';
     }
 
     function downloadCSV() {
         if (!romData.length) { alert('Generate data first!'); return; }
-        let csv = 'Address(Hex),Address(Dec),Display,HI Digit,LO Digit,HI Code(Hex),LO Code(Hex),ROM Word(16-bit),HI Binary,LO Binary\n';
+        let csv = 'Address(Hex),Address(Dec),Display,HI Digit,LO Digit,HI Code(Hex),LO Code(Hex),ROM Word,HI Binary,LO Binary\n';
         romData.forEach(e => {
             csv += `0x${hex2(e.addr)},${e.addr},${e.display},${e.leftCh},${e.rightCh},${hex2(e.hiCode)},${hex2(e.loCode)},${e.word},${bin8(e.hiCode)},${bin8(e.loCode)}\n`;
         });
-        triggerDownload(csv, 'rom_data.csv', 'text/csv');
+        trigger(csv, 'rom_data.csv', 'text/csv');
         document.getElementById('status').textContent = '✓ rom_data.csv downloaded';
     }
 
-    function triggerDownload(content, filename, mime) {
+    function trigger(content, filename, mime) {
         const blob = new Blob([content], { type: mime });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
         a.href = url; a.download = filename; a.click();
         URL.revokeObjectURL(url);
     }
 
-    // ─── Init ─────────────────────────────────────────────────────────────────
+    // ─── Init ──────────────────────────────────────────────────────────────
     window.onload = () => {
-        // Draw blank displays
         drawSeg(document.getElementById('segL'), 0x3F);
         drawSeg(document.getElementById('segR'), 0x3F);
         generateROMData();
